@@ -3,6 +3,9 @@ package model;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+
+import enums.DelimitadorEnum;
+import model.enums.ResponsavelEnum;
 import org.apache.commons.lang3.StringUtils;
 
 public class Responsavel {
@@ -21,7 +24,7 @@ public class Responsavel {
 
     public static Responsavel parseFromText(String text) {
 
-      /*  if (!StringUtils.isEmpty(text.toString())) {
+        if (!StringUtils.isEmpty(text.toString())) {
 
             String[] line = text.toString().split(DelimitadorEnum.PONTO_E_VIRGULA.name(), -1);
 
@@ -32,10 +35,6 @@ public class Responsavel {
             }
 
         }
-        return null;
-
-       */
-
         return null;
     }
 

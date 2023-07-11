@@ -1,6 +1,8 @@
+package utils;
 
 import model.Responsavel;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import utils.HierarquiaUtil;
@@ -57,14 +59,13 @@ public class HierarquiaUtilTest {
         List<String> m41 = HierarquiaUtil.hierarquiaBuild(MATRICULA_T3300041, mapResponsavel);
         List<String> m40 = HierarquiaUtil.hierarquiaBuild(MATRICULA_T3300040, mapResponsavel);
 
-        assertThat(TAMANHO_HIERARQUIA_37, is(m37.size()));
-        assertThat(TAMANHO_HIERARQUIA_36, is(m36.size()));
-        assertThat(TAMANHO_HIERARQUIA_44, is(m44.size()));
-        assertThat(TAMANHO_HIERARQUIA_43, is(m43.size()));
-        assertThat(TAMANHO_HIERARQUIA_42, is(m42.size()));
-        assertThat(TAMANHO_HIERARQUIA_41, is(m41.size()));
-        assertThat(TAMANHO_HIERARQUIA_40, is(m40.size()));
-
+        Assert.assertEquals(TAMANHO_HIERARQUIA_37, m37.size());
+        Assert.assertEquals(TAMANHO_HIERARQUIA_36, m36.size());
+        Assert.assertEquals(TAMANHO_HIERARQUIA_44, m44.size());
+        Assert.assertEquals(TAMANHO_HIERARQUIA_43, m43.size());
+        Assert.assertEquals(TAMANHO_HIERARQUIA_42, m42.size());
+        Assert.assertEquals(TAMANHO_HIERARQUIA_41, m41.size());
+        Assert.assertEquals(TAMANHO_HIERARQUIA_40, m40.size());
 
 
         System.out.println("------------");

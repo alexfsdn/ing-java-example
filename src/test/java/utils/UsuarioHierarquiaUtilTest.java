@@ -1,3 +1,4 @@
+package utils;
 
 import model.Login;
 import model.Responsavel;
@@ -5,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import utils.UsuarioHierarquiaUtil;
 
 import java.util.*;
 

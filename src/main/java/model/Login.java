@@ -1,5 +1,7 @@
 package model;
 
+import enums.DelimitadorEnum;
+import model.enums.LoginEnum;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -26,7 +28,7 @@ public class Login {
 
     public static Login parseFromText(String text) {
 
-       /* if (!StringUtils.isEmpty(text.toString())) {
+        if (!StringUtils.isEmpty(text.toString())) {
 
             String[] line = text.toString().split(DelimitadorEnum.PIPE.name(), -1);
 
@@ -38,7 +40,7 @@ public class Login {
             }
         }
 
-        */
+
         return null;
     }
 
