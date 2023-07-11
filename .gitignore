@@ -1,0 +1,8 @@
+.settings/
+.cache-main.bkp
+/bin/
+.idea.bkp/*
+/.idea/
+/project/
+*.iml
+.jar
