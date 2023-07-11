@@ -1,4 +1,4 @@
-package jobs;
+package interfaces;
 
 public interface IProccess {
 

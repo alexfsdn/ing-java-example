@@ -20,5 +20,13 @@ public @interface Raw {
 
     String tableName() default "uniformaed";
 
+    String delimiter() default ";";
+
+    String inputHdfs() default "/data/input";
+
+    String outputHdfs() default "/data/ouput/";
+
     String layer() default layer;
+
+    boolean header() default false;
 }

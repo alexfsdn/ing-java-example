@@ -8,7 +8,7 @@ public class RawTest {
     @Test
     public void test() {
         Class<?> class_ = ProccessA.class;
-        Raw raw = (Raw) class_.getAnnotation(Raw.class);
+        Raw raw = class_.getAnnotation(Raw.class);
 
         System.out.println("---SHOW---");
         System.out.println("FileName: " + raw.fileName());
@@ -17,7 +17,11 @@ public class RawTest {
         System.out.println("Description: " + raw.description());
         System.out.println("Database: " + raw.database());
         System.out.println("TableName: " + raw.tableName());
+        System.out.println("Delimiter: " + raw.delimiter());
+        System.out.println("Input hdfs: " + raw.inputHdfs());
+        System.out.println("Output hdfs: " + raw.outputHdfs());
         System.out.println("Layer: " + raw.layer());
+        System.out.println("Header: " + raw.header());
         System.out.println("---THE END---");
     }
 

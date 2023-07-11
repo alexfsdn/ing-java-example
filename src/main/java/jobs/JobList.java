@@ -1,5 +1,6 @@
 package jobs;
 
+import interfaces.IProccess;
 import jobs.raw.ProccessA;
 
 import java.util.LinkedHashMap;
