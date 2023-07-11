@@ -11,9 +11,32 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <spark.version.project>2.4.8</spark.version.project>
+        <spark.version.project.artifact>2.12</spark.version.project.artifact>
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_${spark.version.project.artifact}</artifactId>
+            <version>${spark.version.project}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql_${spark.version.project.artifact}</artifactId>
+            <version>${spark.version.project}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-hive_${spark.version.project.artifact}</artifactId>
+            <version>${spark.version.project}</version>
+            <scope>provided</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>org.apache.commons</groupId>

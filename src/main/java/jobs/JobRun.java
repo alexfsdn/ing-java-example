@@ -1,6 +1,8 @@
 package jobs;
 
+import base.services.SparkSessionsServices;
 import interfaces.IProccess;
+import org.apache.spark.sql.SparkSession;
 import utils.TodayUtils;
 
 
@@ -30,7 +32,9 @@ public class JobRun {
 
         IProccess job = new JobList().job(jobName);
 
-        job.run(dt_ref);
+        SparkSession spark = SparkSessionsServices.devLocalEnableHiveSupport();
+
+        job.run(spark, dt_ref);
 
     }
 }

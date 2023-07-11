@@ -10,7 +10,9 @@ public @interface Raw {
 
     String fileName() default "";
 
-    String extension() default ".txt";
+    String formatDateInTheFileName() default "YYYYMMDD";
+
+    String extension() default "txt";
 
     String jobName() default "uniformaed";
 
@@ -29,4 +31,6 @@ public @interface Raw {
     String layer() default layer;
 
     boolean header() default false;
+
+    String encoding() default "UTF-8";
 }
