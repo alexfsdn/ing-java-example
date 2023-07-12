@@ -13,7 +13,15 @@ public class ProccessATest {
         SQLContext hiveContext = spark.sqlContext();
 
         hiveContext.sql("CREATE DATABASE IF NOT EXISTS testDB");
-        hiveContext.sql("CREATE TABLE IF NOT EXISTS testDB.tableUser (name STRING, age STRING, cpf STRING, dat_ref STRING, INTESTION_NAME STRING, PARTITION_NAME STRING)");
+        hiveContext.sql("CREATE TABLE IF NOT EXISTS testDB.tableUser (\n" +
+                "    name STRING,\n" +
+                "    age STRING,\n" +
+                "    cpf STRING,\n" +
+                "    dat_ref STRING,\n" +
+                "    TIME_STAMP_REFERENCE STRING,\n" +
+                        "PARTITION_REFERENCE STRING" +
+                ")\n");
+                //"PARTITIONED BY (PARTITION_REFERENCE STRING)");
 
     }
 
@@ -22,20 +30,23 @@ public class ProccessATest {
     }
 
     @Test
-    public void testReproccess() {
-
-       // cleanUp();
-       // buildMock();
-
-        String args[] = {"ProccessA", "20220812"};
-        JobRun.main(args);
-    }
-
-    @Test
     public void test() {
+        cleanUp();
+        buildMock();
+
         String args[] = {"ProccessA"};
-        JobRun.main(args);
+        JobRun.run(args, spark);
+
+        spark.sqlContext().sql("select * from testDB.tableUser").show(20, false);
+
+        String argsReproc[] = {"ProccessA", "20220812"};
+        JobRun.run(argsReproc, spark);
+
+        spark.sqlContext().sql("select * from testDB.tableUser").show(20, false);
+
+        cleanUp();
     }
+
 
     @Test(expected = IllegalArgumentException.class)
     public void IllegalArgumentExcepetionTestToJobName() {

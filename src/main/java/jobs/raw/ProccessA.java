@@ -6,11 +6,13 @@ import interfaces.IProccess;
 import model.enums.ProccessAEnum;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StringType;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
+import org.apache.spark.storage.StorageLevel;
 
 import static org.apache.spark.sql.functions.*;
 
@@ -35,6 +37,8 @@ public class ProccessA implements IProccess {
     private final String logStarting = String.format("Starting proccess  %s", ProccessA.class);
 
     private final String INVALID_LINES = "_corrupt_record";
+    private final String TIME_STAMP_REFERENCE = "TIME_STAMP_REFERENCE";
+    private final String PARTITION_REFERENCE = "PARTITION_REFERENCE";
 
     @Override
     public void run(SparkSession spark, String dt_ref) {
@@ -77,14 +81,21 @@ public class ProccessA implements IProccess {
                 .option("mode", "PERMISSIVE")
                 .load(fileName).cache();
 
-        dataset.show(10, false);
-
         dataset = dataset.filter(col(INVALID_LINES).isNull())
                 .drop(col(INVALID_LINES));
 
-        dataset.show(10, false);
+        dataset = dataset.withColumn(TIME_STAMP_REFERENCE, current_timestamp())
+                .withColumn(PARTITION_REFERENCE, lit(dt_ref)).select(col(ProccessAEnum.name.name()),
+                        col(ProccessAEnum.age.name()),
+                        col(ProccessAEnum.cpf.name()),
+                        col(ProccessAEnum.dat_ref.name()),
+                        col(TIME_STAMP_REFERENCE),
+                        col(PARTITION_REFERENCE)).persist(StorageLevel.MEMORY_ONLY());
 
-        //salvar linhas válidas
+        dataset.write().format("hive").mode(SaveMode.Append)
+                .option("partitionOverwriteMode", "dynamic")
+                .insertInto("testDB.tableUser");
+
     }
 
 

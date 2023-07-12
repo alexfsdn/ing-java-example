@@ -9,6 +9,11 @@ import utils.TodayUtils;
 public class JobRun {
 
     public static void main(String[] args) {
+        SparkSession spark = SparkSessionsServices.devLocalEnableHiveSupport();
+        new JobRun().run(args, spark);
+    }
+
+    public static void run(String[] args, SparkSession spark) {
         if (args.length <= 0) {
             throw new IllegalArgumentException(String.format("argument with job name is required"));
         }
@@ -32,9 +37,6 @@ public class JobRun {
 
         IProccess job = new JobList().job(jobName);
 
-        SparkSession spark = SparkSessionsServices.devLocalEnableHiveSupport();
-
         job.run(spark, dt_ref);
-
     }
 }
