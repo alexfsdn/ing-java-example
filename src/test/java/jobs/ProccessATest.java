@@ -1,27 +1,33 @@
 package jobs;
 
 import base.services.SparkSessionsServices;
+import model.enums.ProccessAEnum;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.SparkSession;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class ProccessATest {
 
     private SparkSession spark = SparkSessionsServices.devLocalEnableHiveSupport();
 
+    private final String TIME_STAMP_REFERENCE = "TIME_STAMP_REFERENCE";
+    private final String PARTITION_REFERENCE = "PARTITION_REFERENCE";
+
     public void buildMock() {
         SQLContext hiveContext = spark.sqlContext();
 
         hiveContext.sql("CREATE DATABASE IF NOT EXISTS testDB");
+
         hiveContext.sql("CREATE TABLE IF NOT EXISTS testDB.tableUser (\n" +
-                "    name STRING,\n" +
-                "    age STRING,\n" +
-                "    cpf STRING,\n" +
-                "    dat_ref STRING,\n" +
-                "    TIME_STAMP_REFERENCE STRING,\n" +
-                        "PARTITION_REFERENCE STRING" +
-                ")\n");
-                //"PARTITIONED BY (PARTITION_REFERENCE STRING)");
+                ProccessAEnum.name.name() + " STRING, " +
+                ProccessAEnum.age.name() + " STRING, " +
+                ProccessAEnum.cpf.name() + " STRING, " +
+                ProccessAEnum.dat_ref.name() + " STRING, " +
+                TIME_STAMP_REFERENCE + " TIMESTAMP )" +
+                "PARTITIONED BY (" + PARTITION_REFERENCE + " STRING)");
 
     }
 
@@ -34,15 +40,29 @@ public class ProccessATest {
         cleanUp();
         buildMock();
 
-        String args[] = {"ProccessA"};
+        String label_20230711 = "20230711";
+        String args[] = {"ProccessA", label_20230711};
         JobRun.run(args, spark);
 
         spark.sqlContext().sql("select * from testDB.tableUser").show(20, false);
 
-        String argsReproc[] = {"ProccessA", "20220812"};
+        String label_20220812 = "20220812";
+        String argsReproc[] = {"ProccessA", label_20220812};
         JobRun.run(argsReproc, spark);
 
-        spark.sqlContext().sql("select * from testDB.tableUser").show(20, false);
+        JobRun.run(args, spark);//overwrite 20230711
+
+        Dataset<Row> finalResult = spark.sqlContext().sql("select * from testDB.tableUser");
+
+        finalResult.show(20, false);
+
+        Dataset<Row> dt20230711 = finalResult.filter(PARTITION_REFERENCE.concat("=").concat(label_20230711));
+
+        Dataset<Row> dt20220812 = finalResult.filter(PARTITION_REFERENCE.concat("=").concat(label_20220812));
+
+
+        Assert.assertEquals(5, dt20230711.count());
+        Assert.assertEquals(5, dt20220812.count());
 
         cleanUp();
     }

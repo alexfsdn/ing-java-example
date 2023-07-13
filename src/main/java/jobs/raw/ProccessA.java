@@ -25,8 +25,8 @@ import java.util.Map;
         extension = "csv",
         jobName = "proccessA",
         description = "teste do processo A",
-        database = "databasepro",
-        tableName = "tablepro",
+        database = "testDB",
+        tableName = "tableUser",
         inputHdfs = "src/test/resources/input/",
         outputHdfs = "src/test/resources/output/",
         delimiter = ";",
@@ -84,17 +84,26 @@ public class ProccessA implements IProccess {
         dataset = dataset.filter(col(INVALID_LINES).isNull())
                 .drop(col(INVALID_LINES));
 
-        dataset = dataset.withColumn(TIME_STAMP_REFERENCE, current_timestamp())
-                .withColumn(PARTITION_REFERENCE, lit(dt_ref)).select(col(ProccessAEnum.name.name()),
+        dataset.withColumn(TIME_STAMP_REFERENCE, current_timestamp())
+                .select(col(ProccessAEnum.name.name()),
                         col(ProccessAEnum.age.name()),
                         col(ProccessAEnum.cpf.name()),
                         col(ProccessAEnum.dat_ref.name()),
-                        col(TIME_STAMP_REFERENCE),
-                        col(PARTITION_REFERENCE)).persist(StorageLevel.MEMORY_ONLY());
+                        col(TIME_STAMP_REFERENCE)).createOrReplaceTempView("process_a_tmp");
 
-        dataset.write().format("hive").mode(SaveMode.Append)
-                .option("partitionOverwriteMode", "dynamic")
-                .insertInto("testDB.tableUser");
+        String tableName = raw.database().concat(".").concat(raw.tableName());
+
+        String query = "INSERT OVERWRITE TABLE " + tableName + " PARTITION (" + PARTITION_REFERENCE + "=" + dt_ref + ") " +
+                "SELECT " +
+                ProccessAEnum.name.name() + ", " +
+                ProccessAEnum.age.name() + ", " +
+                ProccessAEnum.cpf.name() + ", " +
+                ProccessAEnum.dat_ref.name() + ", " +
+                TIME_STAMP_REFERENCE + " FROM process_a_tmp";
+
+        System.out.println(query);
+
+        spark.sqlContext().sql(query);
 
     }
 
