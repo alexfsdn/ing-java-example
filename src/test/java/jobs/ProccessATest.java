@@ -60,6 +60,8 @@ public class ProccessATest {
 
         Dataset<Row> dt20220812 = finalResult.filter(PARTITION_REFERENCE.concat("=").concat(label_20220812));
 
+        spark.sqlContext().sql("show partitions testDB.tableUser ").show(10, false);
+
 
         Assert.assertEquals(5, dt20230711.count());
         Assert.assertEquals(5, dt20220812.count());

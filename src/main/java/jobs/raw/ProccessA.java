@@ -13,6 +13,7 @@ import org.apache.spark.sql.types.StringType;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.storage.StorageLevel;
+import utils.TodayUtils;
 
 import static org.apache.spark.sql.functions.*;
 
@@ -84,12 +85,14 @@ public class ProccessA implements IProccess {
         dataset = dataset.filter(col(INVALID_LINES).isNull())
                 .drop(col(INVALID_LINES));
 
+        String tableNameTMP = raw.tableName().concat(TodayUtils.getTodayOnlyNumbers());
+
         dataset.withColumn(TIME_STAMP_REFERENCE, current_timestamp())
                 .select(col(ProccessAEnum.name.name()),
                         col(ProccessAEnum.age.name()),
                         col(ProccessAEnum.cpf.name()),
                         col(ProccessAEnum.dat_ref.name()),
-                        col(TIME_STAMP_REFERENCE)).createOrReplaceTempView("process_a_tmp");
+                        col(TIME_STAMP_REFERENCE)).createOrReplaceTempView(tableNameTMP);
 
         String tableName = raw.database().concat(".").concat(raw.tableName());
 
@@ -99,7 +102,7 @@ public class ProccessA implements IProccess {
                 ProccessAEnum.age.name() + ", " +
                 ProccessAEnum.cpf.name() + ", " +
                 ProccessAEnum.dat_ref.name() + ", " +
-                TIME_STAMP_REFERENCE + " FROM process_a_tmp";
+                TIME_STAMP_REFERENCE + " FROM " + tableNameTMP;
 
         System.out.println(query);
 
