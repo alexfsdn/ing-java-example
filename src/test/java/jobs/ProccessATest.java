@@ -9,12 +9,14 @@ import org.apache.spark.sql.SparkSession;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.net.URISyntaxException;
+
 public class ProccessATest {
 
     private SparkSession spark = SparkSessionsServices.devLocalEnableHiveSupport();
 
     private final String TIME_STAMP_REFERENCE = "TIME_STAMP_REFERENCE";
-    private final String PARTITION_REFERENCE = "PARTITION_REFERENCE";
+    private final String PARTITION_REFERENCE = "dat_reference";
 
     public void buildMock() {
         SQLContext hiveContext = spark.sqlContext();
@@ -36,7 +38,7 @@ public class ProccessATest {
     }
 
     @Test
-    public void test() {
+    public void test() throws URISyntaxException {
         cleanUp();
         buildMock();
 

@@ -2,53 +2,85 @@ package jobs.raw;
 
 import annotations.Partitioned;
 import annotations.Raw;
+import dtos.LivroDto;
 import interfaces.IProccess;
 import model.enums.ProccessAEnum;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
+import model.enums.LivroEnum;
+import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.StringType;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
-import org.apache.spark.storage.StorageLevel;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 import utils.TodayUtils;
 
-import static org.apache.spark.sql.functions.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-@Partitioned(daily = true, partition = "dat_reference")
-@Raw(fileName = "proccess_a_YYYYMMDD",
+import static org.apache.spark.sql.functions.col;
+import static org.apache.spark.sql.functions.current_timestamp;
+
+@Partitioned(weekly = true, daily = false, monthly = false, partition = "dat_ref")
+@Raw(fileName = "livros_YYYYMMDD",
         formatDateInTheFileName = "YYYYMMDD",
         extension = "csv",
-        jobName = "proccessA",
-        description = "teste do processo A",
-        database = "testDB",
-        tableName = "tableUser",
+        jobName = "livrosProccess",
+        description = "teste do livrosProccess",
+        database = "livroDB",
+        tableName = "livrosTable",
         inputHdfs = "src/test/resources/input/",
         outputHdfs = "src/test/resources/output/",
         delimiter = ";",
         header = true
 )
-public class ProccessA implements IProccess {
+public class LivroProccess implements IProccess {
 
-    private final String logStarting = String.format("Starting proccess  %s", ProccessA.class);
+    private final String logStarting = String.format("Starting proccess  %s", LivroProccess.class);
 
-    private final String INVALID_LINES = "_corrupt_record";
     private final String TIME_STAMP_REFERENCE = "TIME_STAMP_REFERENCE";
-    private final String PARTITION_REFERENCE = "PARTITION_REFERENCE";
+
+    private RestTemplate restTemplate;
+
+    final java.net.URI URI = new URI("http://localhost:8080/livros");
+
+    public LivroProccess() throws URISyntaxException {
+    }
 
     @Override
     public void run(SparkSession spark, String dt_ref) {
 
         System.out.println(logStarting);
 
-        Class<?> class_ = ProccessA.class;
+        Class<?> class_ = LivroProccess.class;
         Raw raw = class_.getAnnotation(Raw.class);
         Partitioned partitioned = class_.getAnnotation(Partitioned.class);
+
+
+        final ParameterizedTypeReference<List<LivroDto>> TYPE_LIST_OF_PEOPLE_VO = new ParameterizedTypeReference<List<LivroDto>>() {
+        };
+
+        final HttpEntity<LivroDto> PERSON_VO_NULL = null;
+
+        restTemplate = new RestTemplate();
+        ResponseEntity<List<LivroDto>> result = restTemplate.exchange(URI, HttpMethod.GET,
+                PERSON_VO_NULL, TYPE_LIST_OF_PEOPLE_VO);
+
+        List<LivroDto> livros = result.getBody();
+
+        for (LivroDto dto :
+                livros) {
+
+            System.out.println("ID: " + dto.getId());
+            System.out.println("Nome: " + dto.getNome());
+            System.out.println("Nome da Editora: " + dto.getNomeDaEditora());
+            System.out.println("Número de páginas: " + dto.getNumeroPaginas());
+        }
+
 
         System.out.println("---LIST CONFIG---");
         System.out.println("FileName: " + raw.fileName());
@@ -72,42 +104,27 @@ public class ProccessA implements IProccess {
 
         System.out.println("Period: " + dt_ref);
 
-        StructType schemaA = schema().add(INVALID_LINES, DataTypes.StringType, true);
-
-        String fileName = raw.inputHdfs().concat(raw.fileName().concat(".").concat(raw.extension()).replace(raw.formatDateInTheFileName(), dt_ref));
-        Map<String, String> map = new HashMap<>();
-        map.put("delimiter", raw.delimiter());
-        map.put("header", String.valueOf(raw.header()));
-        map.put("encoding", raw.encoding());
-
-        System.out.println("FILE_NAME: " + fileName);
-        Dataset<Row> dataset = spark.read()
-                .format(raw.extension())
-                .options(map)
-                .schema(schemaA)
-                .option("mode", "PERMISSIVE")
-                .load(fileName).cache();
-
-        dataset = dataset.filter(col(INVALID_LINES).isNull())
-                .drop(col(INVALID_LINES));
+        Dataset<Row> livrosDataset = spark.createDataFrame(livros, LivroDto.class);
 
         String tableNameTMP = raw.tableName().concat(TodayUtils.getTodayOnlyNumbers());
 
-        dataset.withColumn(TIME_STAMP_REFERENCE, current_timestamp())
-                .select(col(ProccessAEnum.name.name()),
-                        col(ProccessAEnum.age.name()),
-                        col(ProccessAEnum.cpf.name()),
-                        col(ProccessAEnum.dat_ref.name()),
+        livrosDataset.withColumn(TIME_STAMP_REFERENCE, current_timestamp())
+                .select(col(LivroEnum.id.name()),
+                        col(LivroEnum.nome.name()),
+                        col(LivroEnum.capaDura.name()),
+                        col(LivroEnum.numeroPaginas.name()),
+                        col(LivroEnum.nomeDaEditora.name()),
                         col(TIME_STAMP_REFERENCE)).createOrReplaceTempView(tableNameTMP);
 
         String tableName = raw.database().concat(".").concat(raw.tableName());
 
         String query = "INSERT OVERWRITE TABLE " + tableName + " PARTITION (" + partitioned.partition() + "=" + dt_ref + ") " +
                 "SELECT " +
-                ProccessAEnum.name.name() + ", " +
-                ProccessAEnum.age.name() + ", " +
-                ProccessAEnum.cpf.name() + ", " +
-                ProccessAEnum.dat_ref.name() + ", " +
+                LivroEnum.id.name() + ", " +
+                LivroEnum.nome.name() + ", " +
+                LivroEnum.capaDura.name() + ", " +
+                LivroEnum.numeroPaginas.name() + ", " +
+                LivroEnum.nomeDaEditora.name() + ", " +
                 TIME_STAMP_REFERENCE + " FROM " + tableNameTMP;
 
         System.out.println(query);

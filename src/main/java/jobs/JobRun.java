@@ -5,15 +5,21 @@ import interfaces.IProccess;
 import org.apache.spark.sql.SparkSession;
 import utils.TodayUtils;
 
+import java.net.URISyntaxException;
+
 
 public class JobRun {
 
     public static void main(String[] args) {
-        SparkSession spark = SparkSessionsServices.devLocalEnableHiveSupport();
-        new JobRun().run(args, spark);
+        try {
+            SparkSession spark = SparkSessionsServices.devLocalEnableHiveSupport();
+            new JobRun().run(args, spark);
+        } catch (URISyntaxException uriSyntaxException) {
+            uriSyntaxException.getMessage();
+        }
     }
 
-    public static void run(String[] args, SparkSession spark) {
+    public static void run(String[] args, SparkSession spark) throws URISyntaxException {
         if (args.length <= 0) {
             throw new IllegalArgumentException(String.format("argument with job name is required"));
         }
