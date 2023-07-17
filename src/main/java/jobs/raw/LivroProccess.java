@@ -60,28 +60,6 @@ public class LivroProccess implements IProccess {
         Raw raw = class_.getAnnotation(Raw.class);
         Partitioned partitioned = class_.getAnnotation(Partitioned.class);
 
-
-        final ParameterizedTypeReference<List<LivroDto>> TYPE_LIST_OF_PEOPLE_VO = new ParameterizedTypeReference<List<LivroDto>>() {
-        };
-
-        final HttpEntity<LivroDto> PERSON_VO_NULL = null;
-
-        restTemplate = new RestTemplate();
-        ResponseEntity<List<LivroDto>> result = restTemplate.exchange(URI, HttpMethod.GET,
-                PERSON_VO_NULL, TYPE_LIST_OF_PEOPLE_VO);
-
-        List<LivroDto> livros = result.getBody();
-
-        for (LivroDto dto :
-                livros) {
-
-            System.out.println("ID: " + dto.getId());
-            System.out.println("Nome: " + dto.getNome());
-            System.out.println("Nome da Editora: " + dto.getNomeDaEditora());
-            System.out.println("Número de páginas: " + dto.getNumeroPaginas());
-        }
-
-
         System.out.println("---LIST CONFIG---");
         System.out.println("FileName: " + raw.fileName());
         System.out.println("Extesion: " + raw.extension());
@@ -103,6 +81,26 @@ public class LivroProccess implements IProccess {
         System.out.println("---LIST CONFIG THE END---");
 
         System.out.println("Period: " + dt_ref);
+
+        final ParameterizedTypeReference<List<LivroDto>> TYPE_LIST_OF_PEOPLE_VO = new ParameterizedTypeReference<List<LivroDto>>() {
+        };
+
+        final HttpEntity<LivroDto> PERSON_VO_NULL = null;
+
+        restTemplate = new RestTemplate();
+        ResponseEntity<List<LivroDto>> result = restTemplate.exchange(URI, HttpMethod.GET,
+                PERSON_VO_NULL, TYPE_LIST_OF_PEOPLE_VO);
+
+        List<LivroDto> livros = result.getBody();
+
+        for (LivroDto dto :
+                livros) {
+
+            System.out.println("ID: " + dto.getId());
+            System.out.println("Nome: " + dto.getNome());
+            System.out.println("Nome da Editora: " + dto.getNomeDaEditora());
+            System.out.println("Número de páginas: " + dto.getNumeroPaginas());
+        }
 
         Dataset<Row> livrosDataset = spark.createDataFrame(livros, LivroDto.class);
 
