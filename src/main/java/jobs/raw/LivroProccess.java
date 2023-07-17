@@ -85,11 +85,11 @@ public class LivroProccess implements IProccess {
         final ParameterizedTypeReference<List<LivroDto>> TYPE_LIST_OF_PEOPLE_VO = new ParameterizedTypeReference<List<LivroDto>>() {
         };
 
-        final HttpEntity<LivroDto> PERSON_VO_NULL = null;
+        final HttpEntity<LivroDto> LIVRO_NULL = null;
 
         restTemplate = new RestTemplate();
         ResponseEntity<List<LivroDto>> result = restTemplate.exchange(URI, HttpMethod.GET,
-                PERSON_VO_NULL, TYPE_LIST_OF_PEOPLE_VO);
+                LIVRO_NULL, TYPE_LIST_OF_PEOPLE_VO);
 
         List<LivroDto> livros = result.getBody();
 
