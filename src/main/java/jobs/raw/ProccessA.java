@@ -93,22 +93,26 @@ public class ProccessA implements IProccess {
 
         String tableNameTMP = raw.tableName().concat(TodayUtils.getTodayOnlyNumbers());
 
-        dataset.withColumn(TIME_STAMP_REFERENCE, current_timestamp())
+        dataset = dataset.withColumn(TIME_STAMP_REFERENCE, current_timestamp()).withColumn(PARTITION_REFERENCE, lit(dt_ref))
                 .select(col(ProccessAEnum.name.name()),
                         col(ProccessAEnum.age.name()),
                         col(ProccessAEnum.cpf.name()),
                         col(ProccessAEnum.dat_ref.name()),
-                        col(TIME_STAMP_REFERENCE)).createOrReplaceTempView(tableNameTMP);
+                        col(TIME_STAMP_REFERENCE),
+                        col(PARTITION_REFERENCE));
+
+        dataset.createOrReplaceTempView(tableNameTMP);
 
         String tableName = raw.database().concat(".").concat(raw.tableName());
 
-        String query = "INSERT OVERWRITE TABLE " + tableName + " PARTITION (" + partitioned.partition() + "=" + dt_ref + ") " +
+        String query = "INSERT OVERWRITE TABLE " + tableName + " PARTITION (" + partitioned.partition() + ") " +
                 "SELECT " +
                 ProccessAEnum.name.name() + ", " +
                 ProccessAEnum.age.name() + ", " +
                 ProccessAEnum.cpf.name() + ", " +
                 ProccessAEnum.dat_ref.name() + ", " +
-                TIME_STAMP_REFERENCE + " FROM " + tableNameTMP;
+                TIME_STAMP_REFERENCE + ", " +
+                PARTITION_REFERENCE + " FROM " + tableNameTMP;
 
         System.out.println(query);
 
