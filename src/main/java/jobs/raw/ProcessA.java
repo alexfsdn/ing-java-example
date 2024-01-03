@@ -33,7 +33,6 @@ import java.util.Map;
 public class ProcessA implements IProcess {
 
     private final String logStarting = String.format("Starting process  %s", ProcessA.class);
-
     private final String INVALID_LINES = "_corrupt_record";
     private final String TIME_STAMP_REFERENCE = "TIME_STAMP_REFERENCE";
     private final String PARTITION_REFERENCE = "PARTITION_REFERENCE";

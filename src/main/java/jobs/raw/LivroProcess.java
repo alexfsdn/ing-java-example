@@ -41,13 +41,9 @@ import static org.apache.spark.sql.functions.current_timestamp;
 public class LivroProcess implements IProcess {
 
     private final String logStarting = String.format("Starting process  %s", LivroProcess.class);
-
     private final String TIME_STAMP_REFERENCE = "TIME_STAMP_REFERENCE";
-
     private RestTemplate restTemplate;
-
     final java.net.URI URI = new URI("http://localhost:8080/livros");
-
     public LivroProcess() throws URISyntaxException {
     }
 
