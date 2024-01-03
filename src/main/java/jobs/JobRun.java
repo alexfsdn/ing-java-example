@@ -1,7 +1,7 @@
 package jobs;
 
 import base.services.SparkSessionsServices;
-import interfaces.IProccess;
+import interfaces.IProcess;
 import org.apache.spark.sql.SparkSession;
 import utils.TodayUtils;
 
@@ -33,15 +33,15 @@ public class JobRun {
             if (!dt_ref.matches("\\d+")) {
                 throw new IllegalArgumentException(String.format("The %s argument is invalid, the second argument should type date valid ", dt_ref));
             }
-            logStarting = "Execution reproccess data to job %s and date %s is starting...";
+            logStarting = "Execution reprocess data to job %s and date %s is starting...";
         } else {
             dt_ref = TodayUtils.getTodayOnlyNumbers();
-            logStarting = "Execution proccess data to job %s and date %s is starting...";
+            logStarting = "Execution process data to job %s and date %s is starting...";
         }
 
         System.out.println(String.format(logStarting, jobName, dt_ref));
 
-        IProccess job = new JobList().job(jobName);
+        IProcess job = new JobList().job(jobName);
 
         job.run(spark, dt_ref);
     }

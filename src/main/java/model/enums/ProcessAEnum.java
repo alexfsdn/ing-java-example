@@ -1,6 +1,6 @@
 package model.enums;
 
-public enum ProccessAEnum {
+public enum ProcessAEnum {
     name,
     age,
     cpf,

@@ -2,17 +2,14 @@ package jobs.raw;
 
 import annotations.Partitioned;
 import annotations.Raw;
-import interfaces.IProccess;
-import model.enums.ProccessAEnum;
+import interfaces.IProcess;
+import model.enums.ProcessAEnum;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.StringType;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
-import org.apache.spark.storage.StorageLevel;
 import utils.TodayUtils;
 
 import static org.apache.spark.sql.functions.*;
@@ -21,10 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Partitioned(daily = true, partition = "dat_reference")
-@Raw(fileName = "proccess_a_YYYYMMDD",
+@Raw(fileName = "process_a_YYYYMMDD",
         formatDateInTheFileName = "YYYYMMDD",
         extension = "csv",
-        jobName = "proccessA",
+        jobName = "processA",
         description = "teste do processo A",
         database = "testDB",
         tableName = "tableUser",
@@ -33,9 +30,9 @@ import java.util.Map;
         delimiter = ";",
         header = true
 )
-public class ProccessA implements IProccess {
+public class ProcessA implements IProcess {
 
-    private final String logStarting = String.format("Starting proccess  %s", ProccessA.class);
+    private final String logStarting = String.format("Starting process  %s", ProcessA.class);
 
     private final String INVALID_LINES = "_corrupt_record";
     private final String TIME_STAMP_REFERENCE = "TIME_STAMP_REFERENCE";
@@ -46,7 +43,7 @@ public class ProccessA implements IProccess {
 
         System.out.println(logStarting);
 
-        Class<?> class_ = ProccessA.class;
+        Class<?> class_ = ProcessA.class;
         Raw raw = class_.getAnnotation(Raw.class);
         Partitioned partitioned = class_.getAnnotation(Partitioned.class);
 
@@ -94,10 +91,10 @@ public class ProccessA implements IProccess {
         String tableNameTMP = raw.tableName().concat(TodayUtils.getTodayOnlyNumbers());
 
         dataset = dataset.withColumn(TIME_STAMP_REFERENCE, current_timestamp()).withColumn(PARTITION_REFERENCE, lit(dt_ref))
-                .select(col(ProccessAEnum.name.name()),
-                        col(ProccessAEnum.age.name()),
-                        col(ProccessAEnum.cpf.name()),
-                        col(ProccessAEnum.dat_ref.name()),
+                .select(col(ProcessAEnum.name.name()),
+                        col(ProcessAEnum.age.name()),
+                        col(ProcessAEnum.cpf.name()),
+                        col(ProcessAEnum.dat_ref.name()),
                         col(TIME_STAMP_REFERENCE),
                         col(PARTITION_REFERENCE));
 
@@ -107,10 +104,10 @@ public class ProccessA implements IProccess {
 
         String query = "INSERT OVERWRITE TABLE " + tableName + " PARTITION (" + partitioned.partition() + ") " +
                 "SELECT " +
-                ProccessAEnum.name.name() + ", " +
-                ProccessAEnum.age.name() + ", " +
-                ProccessAEnum.cpf.name() + ", " +
-                ProccessAEnum.dat_ref.name() + ", " +
+                ProcessAEnum.name.name() + ", " +
+                ProcessAEnum.age.name() + ", " +
+                ProcessAEnum.cpf.name() + ", " +
+                ProcessAEnum.dat_ref.name() + ", " +
                 TIME_STAMP_REFERENCE + ", " +
                 PARTITION_REFERENCE + " FROM " + tableNameTMP;
 
@@ -123,10 +120,10 @@ public class ProccessA implements IProccess {
 
     public StructType schema() {
         StructType structType = DataTypes.createStructType(new StructField[]{
-                DataTypes.createStructField(ProccessAEnum.name.toString(), DataTypes.StringType, true),
-                DataTypes.createStructField(ProccessAEnum.age.toString(), DataTypes.StringType, true),
-                DataTypes.createStructField(ProccessAEnum.cpf.toString(), DataTypes.StringType, true),
-                DataTypes.createStructField(ProccessAEnum.dat_ref.toString(), DataTypes.StringType, true)
+                DataTypes.createStructField(ProcessAEnum.name.toString(), DataTypes.StringType, true),
+                DataTypes.createStructField(ProcessAEnum.age.toString(), DataTypes.StringType, true),
+                DataTypes.createStructField(ProcessAEnum.cpf.toString(), DataTypes.StringType, true),
+                DataTypes.createStructField(ProcessAEnum.dat_ref.toString(), DataTypes.StringType, true)
         });
 
         return structType;

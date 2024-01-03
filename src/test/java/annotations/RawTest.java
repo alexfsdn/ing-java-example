@@ -1,13 +1,13 @@
 package annotations;
 
-import jobs.raw.ProccessA;
+import jobs.raw.ProcessA;
 import org.junit.Test;
 
 public class RawTest {
 
     @Test
     public void test() {
-        Class<?> class_ = ProccessA.class;
+        Class<?> class_ = ProcessA.class;
         Raw raw = class_.getAnnotation(Raw.class);
 
         System.out.println("---SHOW---");

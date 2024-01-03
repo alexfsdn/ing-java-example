@@ -3,8 +3,8 @@ package jobs.raw;
 import annotations.Partitioned;
 import annotations.Raw;
 import dtos.LivroDto;
-import interfaces.IProccess;
-import model.enums.ProccessAEnum;
+import interfaces.IProcess;
+import model.enums.ProcessAEnum;
 import model.enums.LivroEnum;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.DataTypes;
@@ -29,8 +29,8 @@ import static org.apache.spark.sql.functions.current_timestamp;
 @Raw(fileName = "livros_YYYYMMDD",
         formatDateInTheFileName = "YYYYMMDD",
         extension = "csv",
-        jobName = "livrosProccess",
-        description = "teste do livrosProccess",
+        jobName = "livrosProcess",
+        description = "teste do livrosProcess",
         database = "livroDB",
         tableName = "livrosTable",
         inputHdfs = "src/test/resources/input/",
@@ -38,9 +38,9 @@ import static org.apache.spark.sql.functions.current_timestamp;
         delimiter = ";",
         header = true
 )
-public class LivroProccess implements IProccess {
+public class LivroProcess implements IProcess {
 
-    private final String logStarting = String.format("Starting proccess  %s", LivroProccess.class);
+    private final String logStarting = String.format("Starting process  %s", LivroProcess.class);
 
     private final String TIME_STAMP_REFERENCE = "TIME_STAMP_REFERENCE";
 
@@ -48,7 +48,7 @@ public class LivroProccess implements IProccess {
 
     final java.net.URI URI = new URI("http://localhost:8080/livros");
 
-    public LivroProccess() throws URISyntaxException {
+    public LivroProcess() throws URISyntaxException {
     }
 
     @Override
@@ -56,7 +56,7 @@ public class LivroProccess implements IProccess {
 
         System.out.println(logStarting);
 
-        Class<?> class_ = LivroProccess.class;
+        Class<?> class_ = LivroProcess.class;
         Raw raw = class_.getAnnotation(Raw.class);
         Partitioned partitioned = class_.getAnnotation(Partitioned.class);
 
@@ -134,10 +134,10 @@ public class LivroProccess implements IProccess {
 
     public StructType schema() {
         StructType structType = DataTypes.createStructType(new StructField[]{
-                DataTypes.createStructField(ProccessAEnum.name.toString(), DataTypes.StringType, true),
-                DataTypes.createStructField(ProccessAEnum.age.toString(), DataTypes.StringType, true),
-                DataTypes.createStructField(ProccessAEnum.cpf.toString(), DataTypes.StringType, true),
-                DataTypes.createStructField(ProccessAEnum.dat_ref.toString(), DataTypes.StringType, true)
+                DataTypes.createStructField(ProcessAEnum.name.toString(), DataTypes.StringType, true),
+                DataTypes.createStructField(ProcessAEnum.age.toString(), DataTypes.StringType, true),
+                DataTypes.createStructField(ProcessAEnum.cpf.toString(), DataTypes.StringType, true),
+                DataTypes.createStructField(ProcessAEnum.dat_ref.toString(), DataTypes.StringType, true)
         });
 
         return structType;

@@ -16,7 +16,7 @@ import java.net.URISyntaxException;
 
 @Configuration
 @EnableAutoConfiguration
-public class ProccessBTest {
+public class ProcessBTest {
 
     private SparkSession spark = SparkSessionsServices.devLocalEnableHiveSupport();
 
@@ -24,7 +24,7 @@ public class ProccessBTest {
 
     final URI URI = new URI("http://localhost:8080/livros");
 
-    public ProccessBTest() throws URISyntaxException {
+    public ProcessBTest() throws URISyntaxException {
     }
 
     private final String TIME_STAMP_REFERENCE = "TIME_STAMP_REFERENCE";
@@ -57,7 +57,7 @@ public class ProccessBTest {
         buildMock();
 
         String label_20230711 = "20230711";
-        String args[] = {"ProccessB", label_20230711};
+        String args[] = {"ProcessB", label_20230711};
         JobRun.run(args, spark);
 
         spark.sqlContext().sql("select * from livroDB.livrosTable").show(20, false);
