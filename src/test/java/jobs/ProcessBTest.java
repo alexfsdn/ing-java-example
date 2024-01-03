@@ -50,7 +50,6 @@ public class ProcessBTest {
         spark.sqlContext().sql("DROP DATABASE IF EXISTS livroDB CASCADE");
     }
 
-
     @Test
     public void test() throws RestClientException, URISyntaxException {
         cleanUp();

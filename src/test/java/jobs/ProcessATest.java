@@ -81,8 +81,7 @@ public class ProcessATest {
 
         spark.sqlContext().sql("show partitions testDB.tableUser ").show(10, false);
 
-        /*
-                +----------------------+
+        /*      +----------------------+
                 |partition             |
                 +----------------------+
                 |dat_reference=20220812|
