@@ -2,6 +2,7 @@ package jobs;
 
 import base.services.SparkSessionsServices;
 import interfaces.IProcess;
+import interfaces.impl.ISparkImpl;
 import org.apache.spark.sql.SparkSession;
 import utils.TodayUtils;
 
@@ -43,6 +44,6 @@ public class JobRun {
 
         IProcess job = new JobList().job(jobName);
 
-        job.run(spark, dt_ref);
+        job.run(new ISparkImpl(spark), dt_ref);
     }
 }

@@ -4,6 +4,7 @@ import annotations.Partitioned;
 import annotations.Raw;
 import dtos.LivroDto;
 import interfaces.IProcess;
+import interfaces.ISpark;
 import model.enums.ProcessAEnum;
 import model.enums.LivroEnum;
 import org.apache.spark.sql.*;
@@ -44,11 +45,12 @@ public class LivroProcess implements IProcess {
     private final String TIME_STAMP_REFERENCE = "TIME_STAMP_REFERENCE";
     private RestTemplate restTemplate;
     final java.net.URI URI = new URI("http://localhost:8080/livros");
+
     public LivroProcess() throws URISyntaxException {
     }
 
     @Override
-    public void run(SparkSession spark, String dt_ref) {
+    public void run(ISpark iSpark, String dt_ref) {
 
         System.out.println(logStarting);
 
@@ -98,7 +100,7 @@ public class LivroProcess implements IProcess {
             System.out.println("Número de páginas: " + dto.getNumeroPaginas());
         }
 
-        Dataset<Row> livrosDataset = spark.createDataFrame(livros, LivroDto.class);
+        Dataset<Row> livrosDataset = iSpark.getSpark().createDataFrame(livros, LivroDto.class);
 
         String tableNameTMP = raw.tableName().concat(TodayUtils.getTodayOnlyNumbers());
 
@@ -123,7 +125,7 @@ public class LivroProcess implements IProcess {
 
         System.out.println(query);
 
-        spark.sqlContext().sql(query);
+        iSpark.getSpark().sqlContext().sql(query);
 
     }
 

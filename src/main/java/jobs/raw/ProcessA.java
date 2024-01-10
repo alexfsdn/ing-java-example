@@ -3,18 +3,19 @@ package jobs.raw;
 import annotations.Partitioned;
 import annotations.Raw;
 import interfaces.IProcess;
+import interfaces.ISpark;
 import model.enums.ProcessAEnum;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import utils.TodayUtils;
 
 import static org.apache.spark.sql.functions.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Partitioned(daily = true, partition = "dat_reference")
@@ -38,7 +39,7 @@ public class ProcessA implements IProcess {
     private final String PARTITION_REFERENCE = "PARTITION_REFERENCE";
 
     @Override
-    public void run(SparkSession spark, String dt_ref) {
+    public void run(ISpark iSpark, String dt_ref) {
 
         System.out.println(logStarting);
 
@@ -68,21 +69,19 @@ public class ProcessA implements IProcess {
 
         System.out.println("Period: " + dt_ref);
 
-        StructType schemaA = schema().add(INVALID_LINES, DataTypes.StringType, true);
+        StructType schema = ProcessAEnum.schema().add(INVALID_LINES, DataTypes.StringType, true);
 
         String fileName = raw.inputHdfs().concat(raw.fileName().concat(".").concat(raw.extension()).replace(raw.formatDateInTheFileName(), dt_ref));
+        String format = raw.extension();
+
         Map<String, String> map = new HashMap<>();
         map.put("delimiter", raw.delimiter());
         map.put("header", String.valueOf(raw.header()));
         map.put("encoding", raw.encoding());
+        map.put("modo", "PERMISSIVE");
 
         System.out.println("FILE_NAME: " + fileName);
-        Dataset<Row> dataset = spark.read()
-                .format(raw.extension())
-                .options(map)
-                .schema(schemaA)
-                .option("mode", "PERMISSIVE")
-                .load(fileName).cache();
+        Dataset<Row> dataset = iSpark.getDataset(fileName, format, map, schema);
 
         dataset = dataset.filter(col(INVALID_LINES).isNull())
                 .drop(col(INVALID_LINES));
@@ -101,30 +100,17 @@ public class ProcessA implements IProcess {
 
         String tableName = raw.database().concat(".").concat(raw.tableName());
 
-        String query = "INSERT OVERWRITE TABLE " + tableName + " PARTITION (" + partitioned.partition() + ") " +
-                "SELECT " +
-                ProcessAEnum.name.name() + ", " +
-                ProcessAEnum.age.name() + ", " +
-                ProcessAEnum.cpf.name() + ", " +
-                ProcessAEnum.dat_ref.name() + ", " +
-                TIME_STAMP_REFERENCE + ", " +
-                PARTITION_REFERENCE + " FROM " + tableNameTMP;
 
-        System.out.println(query);
+        List<String> columns = Arrays.asList(
+                ProcessAEnum.name.name(),
+                ProcessAEnum.age.name(),
+                ProcessAEnum.cpf.name(),
+                ProcessAEnum.dat_ref.name(),
+                TIME_STAMP_REFERENCE);
 
-        spark.sqlContext().sql(query);
+        iSpark.save(columns, tableName, tableNameTMP, partitioned.partition(), dt_ref);
 
-    }
+        System.out.println("process success");
 
-
-    public StructType schema() {
-        StructType structType = DataTypes.createStructType(new StructField[]{
-                DataTypes.createStructField(ProcessAEnum.name.toString(), DataTypes.StringType, true),
-                DataTypes.createStructField(ProcessAEnum.age.toString(), DataTypes.StringType, true),
-                DataTypes.createStructField(ProcessAEnum.cpf.toString(), DataTypes.StringType, true),
-                DataTypes.createStructField(ProcessAEnum.dat_ref.toString(), DataTypes.StringType, true)
-        });
-
-        return structType;
     }
 }
